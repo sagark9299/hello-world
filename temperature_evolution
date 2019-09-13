@@ -1,0 +1,28 @@
+clear all;
+t = linspace(1,10,100);
+Tref = 371.6; % Normal boiling point of heptane
+mw = 100.205; %molecular weight of heptane
+mair = 28; %molecular weight of air
+Tl0 = 323.15; % initial liquid temperature
+kap0 = 39.944e-3; %thermal conductivity of air at initial condition (323 K)
+kap_l0 = 124.41e-3; %thermal conductivity of heptane at initial condition (323 K)
+cp_l0 = 234.12; % J/mol*K
+cp_0 = 0.0298e3; % J/mol*K at 423.5 K
+rho_l0 = 656.49; %liquid density at 323 K;
+Le0 = 2.7; % obtained from Cantera
+lambda0 = 35.12e3; % heat of vaporization at 323 K (J/mol)
+R = 8.314; % J/mol K
+Tin = 423.15; % initial gas temperature
+D0 = 25e-6; % initial liquid droplet size
+alpha_l0 = kap_l0/(rho_l0*cp_l0); % thermal diffusivity at 323 K
+th = D0^2/(4*alpha_l0);
+mmix = mw+mair; %mixture mass
+p_ratio = exp((lambda0/R)*((1/Tref)-(1/Tl0)));
+Yas0 = p_ratio*mw/mmix;
+Yin = 0; %mass fraction of fuel at infinity
+BM0 = Yas0-Yin/(1-Yas0);
+BT0 = (1+BM0)^(1/Le0)-1;
+C2 = lambda0*BT0/cp_0;
+C1 = log(1+BM0)*kap0/(Le0*BT0*kap_l0);
+Tl =  Tin - C2 - ((Tin-Tl0)-C2)*exp(-C1.*t/th);
+plot(t,Tl)
